@@ -1,0 +1,6 @@
+*
+!*.qpf
+!*.tcl
+!*.v
+!.gitignore
+!README.md
