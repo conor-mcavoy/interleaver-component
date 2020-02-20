@@ -1,4 +1,3 @@
-
 module interleaver_fsm(clk,reset,block_size,CRC_start,CRC_data,ready,done);
 		input clk, reset;
 		input block_size;
@@ -19,16 +18,20 @@ end
 
 always @(*) begin
 	current_state = 3'b000;
-	 ready_r = 1'b0;
+	ready_r = 1'b0;
 	done_r = 1'b0;
+	r_reset = 1'b0;
+	w_reset = 1'b0;
 	case (current_state)
 	3'b000:
 		begin
 			if(block_size && CRC_start) begin
 				next_state <= 3'b001;
+				w_reset <= 1'b1;
 			end
 			else if (!block_size && CRC_start)begin
 				next_state <= 3'b010;
+				
 			end
 			else begin
 				next_state <= 3'b000;
@@ -39,6 +42,7 @@ always @(*) begin
 			write_enable <= 1'b1;
 			if(w_counter == 6144)begin
 				next_state <= 3'b011;
+				r_reset <= 1'b1;
 			end
 			else begin
 				next_state <= 3'b001;
@@ -49,6 +53,7 @@ always @(*) begin
 			write_enable <= 1'b1;
 			if(w_counter == 1056) begin
 				next_state <= 3'b100;
+				r_reset <= 1'b1;
 			end
 			else begin
 				next_state <= 3'b010;
