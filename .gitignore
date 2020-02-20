@@ -4,3 +4,5 @@
 !*.v
 !.gitignore
 !README.md
+!*.mif
+!*.py
