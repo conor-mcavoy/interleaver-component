@@ -2,16 +2,16 @@
 
 import sys
 
-header = """DEPTH = 6144;
-WIDTH = 1;
+header = """DEPTH = 8192;
+WIDTH = 13;
 ADDRESS_RADIX = DEC;
-DATA_RADIX = BIN;
+DATA_RADIX = DEC;
 CONTENT BEGIN\n"""
 # required header for MIF files
 
 f1 = 263
 f2 = 480
-
+K = 6144
 
 if (len(sys.argv) == 2):
     # needs 1 arg, name of mif
@@ -19,7 +19,12 @@ if (len(sys.argv) == 2):
     
     data_file_str = ""
     for address in range(0, 8192):
-        data_file_str += str(address) + ":\t 0;\n"
+        if address < 6144:
+            result = (f1 * address + f2 * address**2) % K
+        else:
+            result = 0
+        
+        data_file_str += str(address) + ":\t " + str(result) + ";\n"
 
     print("Writing to data file: " + output_filename)
     data_file = open(output_filename, 'w');

@@ -4,7 +4,7 @@ module counter (enable, clk, reset, count);
 	
 	output reg [12:0] count;
 	
-	wire [12:0] target = 13'd10;
+	wire [12:0] target = 13'd6144;
 	wire target_reached, reset_or_restart;
 	
 	assign target_reached = (count == target);
