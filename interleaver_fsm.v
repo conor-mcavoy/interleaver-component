@@ -1,4 +1,4 @@
-module interleaver_fsm(clk,reset,block_size,CRC_start,CRC_data,CRC_END,ready,done,p1mode_w,p2mode_w,ctr1_re_w,ctr2_re_w,ctr1_en_w,ctr2_en_w,ram1_we_w,ram2_we_w,ctr1_finish,ctr2_finish);
+module interleaver_fsm(clk,reset,block_size,state_w,CRC_start,CRC_data,CRC_END,ready,done,p1mode_w,p2mode_w,ctr1_re_w,ctr2_re_w,ctr1_en_w,ctr2_en_w,ram1_we_w,ram2_we_w,ctr1_finish,ctr2_finish);
 		input clk, reset;
 		input block_size;
 		input CRC_start;
@@ -6,6 +6,7 @@ module interleaver_fsm(clk,reset,block_size,CRC_start,CRC_data,CRC_END,ready,don
 		input CRC_END;
 		input ctr1_finish;
 		input ctr2_finish;
+		output[3:0] state_w;
 		output p1mode_w,p2mode_w,ctr1_re_w,ctr2_re_w,ctr1_en_w,ctr2_en_w,ram1_we_w,ram2_we_w;
 		output ready;
 		output done;
@@ -16,12 +17,9 @@ reg w_reset,r_reset,output_mux,write_enable;
 reg p1mode,p2mode,ctr1_re,ctr2_re,ctr1_en,ctr2_en,ram1_we,ram2_we;
 wire[15:0] ctr1_counter,ctr2_counter;
 reg ready_r, done_r;
-always @ (posedge clk ) begin
-	if(reset) current_state <= 4'b0000;
-	else current_state <= next_state;
-end 
-
-always @(*) begin
+ 
+initial begin
+	
 	ready_r = 1'b0;
 	done_r = 1'b0;
 	p1mode = 1'b0;
@@ -32,7 +30,18 @@ always @(*) begin
 	ctr2_en= 1'b0;
 	ram1_we=1'b0;
 	ram2_we=1'b0;
+end 
+ 
+
+always @(posedge clk or posedge reset) begin
+	if(reset) begin
+		current_state <= 4'b0000;
+		ctr2_re <= 1'b1;
+		ctr1_re = 1'b1;
+	end
+	else begin
 	case (current_state)
+
 	4'b0000: 
 		begin
 			p1mode = 1'b0;
@@ -273,6 +282,8 @@ always @(*) begin
 			next_state<=4'b0000;
 		end
 	endcase
+	current_state <= next_state;
+	end
 end
 
 counter ctr1(clk,ctr1_re,ctr1_counter);
@@ -288,4 +299,5 @@ assign ctr1_en_w = ctr1_en;
 assign ctr2_en_w = ctr2_en;
 assign ram1_we_w = ram1_we;
 assign ram2_we_w = ram2_we;
+assign state_w = next_state;
 endmodule
