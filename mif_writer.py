@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #Script to make pi calculator ROM MIF
 
 import sys
@@ -9,9 +10,15 @@ DATA_RADIX = DEC;
 CONTENT BEGIN\n"""
 # required header for MIF files
 
-f1 = 263
-f2 = 480
-K = 6144
+## large
+#f1 = 263
+#f2 = 480
+#K = 6144
+
+## small
+f1 = 17
+f2 = 66
+K = 1056
 
 if (len(sys.argv) == 2):
     # needs 1 arg, name of mif

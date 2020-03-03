@@ -1,4 +1,4 @@
-module counter_wrapper1 (count_enable, block_size, clk, reset, count, target_reached);
+module counter_wrapper2 (count_enable, block_size, clk, reset, count, target_reached);
 	input count_enable;
 	input block_size; // 0 for small and 1 for large
 	input clk, reset;
@@ -39,5 +39,5 @@ module counter_wrapper1 (count_enable, block_size, clk, reset, count, target_rea
 	wire enable;
 	and (enable, count_enable, target_not_reached);
 	
-	counter1 counter1_inst (reset, enable, clk, q);
+	counter2 counter2_inst (reset, enable, clk, q);
 endmodule

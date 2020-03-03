@@ -40,7 +40,7 @@ always @(posedge clk or posedge reset) begin
 		ctr1_re = 1'b1;
 	end
 	else begin
-		current_state = next_state;
+	current_state = next_state;
 	
 	case (current_state)
 	4'b0000: 
@@ -53,7 +53,7 @@ always @(posedge clk or posedge reset) begin
 			ram2_we=1'b0;
 			if(!block_size && CRC_start) begin
 				next_state <= 4'b0001;
-				ctr1_re <= 1'b1;
+				ctr1_re <= 1'b1; // should we just reset both counters in START anyway?
 			end
 			else if (block_size && CRC_start)begin
 				next_state <= 4'b0010;
