@@ -1,4 +1,4 @@
-module interleaver_fsm(clk,reset,block_size,next_state_w,state_w,CRC_start,CRC_data,CRC_END,ready,done,p1mode_w,p2mode_w,ctr1_re_w,ctr2_re_w,ctr1_en_w,ctr2_en_w,ram1_we_w,ram2_we_w,ctr1_finish,ctr2_finish);
+module interleaver_fsm(clk,reset,block_size,next_state_w,state_w,CRC_start,CRC_data,CRC_END,ready,done,p1mode_w,p2mode_w,ctr1_re_w,ctr2_re_w,ctr1_en_w,ctr2_en_w,ram1_we_w,ram2_we_w,ctr1_finish,ctr2_finish,ctr1_blk,ctr2_blk);
 		input clk, reset;
 		input block_size;
 		input CRC_start;
@@ -8,6 +8,7 @@ module interleaver_fsm(clk,reset,block_size,next_state_w,state_w,CRC_start,CRC_d
 		input ctr2_finish;
 		output[3:0] state_w,next_state_w;
 		output p1mode_w,p2mode_w,ctr1_re_w,ctr2_re_w,ctr1_en_w,ctr2_en_w,ram1_we_w,ram2_we_w;
+		output reg ctr1_blk,ctr2_blk;
 		output ready;
 		output done;
 
@@ -30,6 +31,8 @@ initial begin
 	ctr2_en= 1'b0;
 	ram1_we=1'b0;
 	ram2_we=1'b0;
+	ctr1_blk=1'b0;
+	ctr2_blk=1'b0;
 end 
  
 
@@ -51,6 +54,8 @@ always @(posedge clk or posedge reset) begin
 			ctr2_en= 1'b0;
 			ram1_we=1'b0;
 			ram2_we=1'b0;
+			ctr1_blk=1'b0;
+			ctr2_blk=1'b0;
 			if(!block_size && CRC_start) begin
 				next_state <= 4'b0001;
 				ctr1_re <= 1'b1;
@@ -72,6 +77,8 @@ always @(posedge clk or posedge reset) begin
 			ctr2_en= 1'b0;
 			ram1_we=1'b0;
 			ram2_we=1'b0;
+			ctr1_blk=1'b0;
+			ctr2_blk=1'b0;
 			if(ctr1_finish) begin
 				next_state <= 4'b0111;
 				ctr1_re <= 1'b1;
@@ -89,6 +96,8 @@ always @(posedge clk or posedge reset) begin
 			ctr2_en= 1'b0;
 			ram1_we=1'b0;
 			ram2_we=1'b0;
+			ctr1_blk=1'b1;
+			ctr2_blk=1'b0;
 			if(ctr1_finish) begin
 				if(block_size)begin
 					next_state <= 4'b0100;
@@ -114,6 +123,8 @@ always @(posedge clk or posedge reset) begin
 			ctr2_en= 1'b1;
 			ram1_we=1'b0;
 			ram2_we=1'b1;
+			ctr1_blk=1'b1;
+			ctr2_blk=1'b1;
 			if(CRC_END) begin
 				next_state <= 4'b1001;
 				ctr1_re <= 1'b1;
@@ -145,6 +156,8 @@ always @(posedge clk or posedge reset) begin
 			ctr2_en= 1'b1;
 			ram1_we=1'b1;
 			ram2_we=1'b0;
+			ctr1_blk=1'b1;
+			ctr2_blk=1'b1;
 			if(CRC_END)begin
 				next_state <= 4'b1010;
 				ctr2_re <=1'b1;
@@ -175,6 +188,8 @@ always @(posedge clk or posedge reset) begin
 			ctr2_en= 1'b1;
 			ram1_we=1'b0;
 			ram2_we=1'b1;
+			ctr1_blk=1'b0;
+			ctr2_blk=1'b1;
 			if(ctr2_finish)begin
 				next_state <=4'b0111;
 				ctr1_re <=1'b1;
@@ -191,6 +206,8 @@ always @(posedge clk or posedge reset) begin
 			ctr2_en= 1'b1;
 			ram1_we=1'b1;
 			ram2_we=1'b0;
+			ctr1_blk=1'b1;
+			ctr2_blk=1'b0;
 			if(ctr1_finish)begin
 				next_state <=4'b1000;
 				ctr2_re <=1'b1;
@@ -207,6 +224,8 @@ always @(posedge clk or posedge reset) begin
 			ctr2_en= 1'b0;
 			ram1_we=1'b1;
 			ram2_we=1'b0;
+			ctr1_blk=1'b0;
+			ctr2_blk=1'b0;
 			if(ctr1_finish)begin
 				next_state<=4'b1011;
 			end
@@ -222,6 +241,8 @@ always @(posedge clk or posedge reset) begin
 			ctr2_en= 1'b1;
 			ram1_we=1'b0;
 			ram2_we=1'b1;
+			ctr1_blk=1'b0;
+			ctr2_blk=1'b0;
 			if(ctr2_finish)begin
 				next_state<=4'b1011;
 			end
@@ -237,6 +258,8 @@ always @(posedge clk or posedge reset) begin
 			ctr2_en= 1'b0;
 			ram1_we=1'b1;
 			ram2_we=1'b0;
+			ctr1_blk=1'b1;
+			ctr2_blk=1'b0;
 			if(ctr1_finish)begin
 				next_state<=4'b1011;
 			end
@@ -252,6 +275,8 @@ always @(posedge clk or posedge reset) begin
 			ctr2_en= 1'b1;
 			ram1_we=1'b0;
 			ram2_we=1'b1;
+			ctr1_blk=1'b0;
+			ctr2_blk=1'b1;
 			if(ctr2_finish)begin
 				next_state<=4'b1011;
 			end
@@ -270,6 +295,8 @@ always @(posedge clk or posedge reset) begin
 			next_state<=4'b1010;
 			ready_r=1'b1;
 			done_r = 1'b1;
+			ctr1_blk=1'b0;
+			ctr2_blk=1'b0;
 		end
 	4'b1100:
 		begin
@@ -279,6 +306,8 @@ always @(posedge clk or posedge reset) begin
 			ctr2_en= 1'b0;
 			ram1_we=1'b0;
 			ram2_we=1'b0;
+			ctr1_blk=1'b0;
+			ctr2_blk=1'b0;
 			//wait for something .... go back to 0000
 			next_state<=4'b0000;
 		end
@@ -286,8 +315,7 @@ always @(posedge clk or posedge reset) begin
 	end
 end
 
-counter ctr1(clk,ctr1_re,ctr1_counter);
-counter ctr2(clk,ctr2_re,ctr2_counter);
+
 
 assign done = done_r;
 assign ready = ready_r;
