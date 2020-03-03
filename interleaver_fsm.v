@@ -1,15 +1,20 @@
-module interleaver_fsm(clk,reset,block_size,CRC_start,CRC_data,ready,done);
+module interleaver_fsm(clk,reset,block_size,CRC_start,CRC_data,CRC_END,ready,done,p1mode_w,p2mode_w,ctr1_re_w,ctr2_re_w,ctr1_en_w,ctr2_en_w,ram1_we_w,ram2_we_w,ctr1_finish,ctr2_finish);
 		input clk, reset;
 		input block_size;
 		input CRC_start;
 		input CRC_data;
+		input CRC_END;
+		input ctr1_finish;
+		input ctr2_finish;
+		output p1mode_w,p2mode_w,ctr1_re_w,ctr2_re_w,ctr1_en_w,ctr2_en_w,ram1_we_w,ram2_we_w;
 		output ready;
 		output done;
 
 
 reg[3:0] next_state,current_state;
 reg w_reset,r_reset,output_mux,write_enable;
-wire[15:0] w_counter,r_counter;
+reg p1mode,p2mode,ctr1_re,ctr2_re,ctr1_en,ctr2_en,ram1_we,ram2_we;
+wire[15:0] ctr1_counter,ctr2_counter;
 reg ready_r, done_r;
 always @ (posedge clk ) begin
 	if(reset) current_state <= 4'b0000;
@@ -57,7 +62,7 @@ always @(*) begin
 			ctr2_en= 1'b0;
 			ram1_we=1'b0;
 			ram2_we=1'b0;
-			if(r_counter_1 == 1056) begin
+			if(ctr1_finish) begin
 				next_state <= 4'b0111;
 				ctr1_re <= 1'b1;
 			end
@@ -74,14 +79,14 @@ always @(*) begin
 			ctr2_en= 1'b0;
 			ram1_we=1'b0;
 			ram2_we=1'b0;
-			if(r_counter_1 == 6144) begin
+			if(ctr1_finish) begin
 				if(block_size)begin
-					next_state <= 4'0100;
+					next_state <= 4'b0100;
 					ctr1_re <=1'b1;
 					ctr2_re<=1'b1;
 				end
 				else begin
-					next_state <= 4'0110;
+					next_state <= 4'b0110;
 					ctr1_re <= 1'b1;
 					ctr2_re <=1'b1;
 				end
@@ -99,19 +104,19 @@ always @(*) begin
 			ctr2_en= 1'b1;
 			ram1_we=1'b0;
 			ram2_we=1'b1;
-			if(END) begin
-				next_state <= 4'1001;
+			if(CRC_END) begin
+				next_state <= 4'b1001;
 				ctr1_re <= 1'b1;
 			end
 			else begin
-			if(r_counter_1 == 6144) begin
+			if(ctr1_finish && ctr2_finish) begin
 				if(block_size)begin
-					next_state <= 4'0100;
+					next_state <= 4'b0100;
 					ctr1_re <=1'b1;
 					ctr2_re<=1'b1;
 				end
 				else begin
-					next_state <= 4'0110;
+					next_state <= 4'b0110;
 					ctr1_re <=1'b1;
 					ctr2_re<=1'b1;
 				end
@@ -130,19 +135,19 @@ always @(*) begin
 			ctr2_en= 1'b1;
 			ram1_we=1'b1;
 			ram2_we=1'b0;
-			if(end)begin
-				next_state <= 4'1010;
+			if(CRC_END)begin
+				next_state <= 4'b1010;
 				ctr2_re <=1'b1;
 			end
 			else begin
-				if(ctr_finished)begin
+				if(ctr1_finish && ctr2_finish)begin
 					if(block_size)begin
-						next_state <= 4'0011;
+						next_state <= 4'b0011;
 						ctr1_re <=1'b1;
 						ctr2_re<=1'b1;
 					end
 					else begin
-						next_state<=4'0101;
+						next_state<=4'b0101;
 						ctr1_re <=1'b1;
 						ctr2_re<=1'b1;
 					end
@@ -160,7 +165,7 @@ always @(*) begin
 			ctr2_en= 1'b1;
 			ram1_we=1'b0;
 			ram2_we=1'b1;
-			if(ctr_finished)begin
+			if(ctr2_finish)begin
 				next_state <=4'b0111;
 				ctr1_re <=1'b1;
 			end	
@@ -176,7 +181,7 @@ always @(*) begin
 			ctr2_en= 1'b1;
 			ram1_we=1'b1;
 			ram2_we=1'b0;
-			if(ctr_finished)begin
+			if(ctr1_finish)begin
 				next_state <=4'b1000;
 				ctr2_re <=1'b1;
 			end	
@@ -192,7 +197,7 @@ always @(*) begin
 			ctr2_en= 1'b0;
 			ram1_we=1'b1;
 			ram2_we=1'b0;
-			if(ctr1_finished)begin
+			if(ctr1_finish)begin
 				next_state<=4'b1011;
 			end
 			else begin
@@ -207,7 +212,7 @@ always @(*) begin
 			ctr2_en= 1'b1;
 			ram1_we=1'b0;
 			ram2_we=1'b1;
-			if(ctr2_finished)begin
+			if(ctr2_finish)begin
 				next_state<=4'b1011;
 			end
 			else begin
@@ -222,7 +227,7 @@ always @(*) begin
 			ctr2_en= 1'b0;
 			ram1_we=1'b1;
 			ram2_we=1'b0;
-			if(ctr1_finished)begin
+			if(ctr1_finish)begin
 				next_state<=4'b1011;
 			end
 			else begin
@@ -237,7 +242,7 @@ always @(*) begin
 			ctr2_en= 1'b1;
 			ram1_we=1'b0;
 			ram2_we=1'b1;
-			if(ctr2_finished)begin
+			if(ctr2_finish)begin
 				next_state<=4'b1011;
 			end
 			else begin
@@ -270,10 +275,17 @@ always @(*) begin
 	endcase
 end
 
-counter write_counter_1(clk,w_reset_1,w_counter_1);
-counter read_counter_1(clk,r_reset_1,r_counter_1);
-counter write_counter_2(clk,w_reset_1,w_counter_2);
-counter read_counter_2(clk,r_reset_1,r_counter_2);
+counter ctr1(clk,ctr1_re,ctr1_counter);
+counter ctr2(clk,ctr2_re,ctr2_counter);
+
 assign done = done_r;
 assign ready = ready_r;
+assign p1mode_w = p1mode;
+assign p2mode_w = p2mode;
+assign ctr1_re_w = ctr1_re;
+assign ctr2_re_w = ctr2_re;
+assign ctr1_en_w = ctr1_en;
+assign ctr2_en_w = ctr2_en;
+assign ram1_we_w = ram1_we;
+assign ram2_we_w = ram2_we;
 endmodule
