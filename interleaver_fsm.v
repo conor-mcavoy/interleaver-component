@@ -44,7 +44,8 @@ always @(posedge clk or posedge reset) begin
 	end
 	else begin
 	current_state = next_state;
-	
+	ctr1_re <= 1'b0;
+	ctr2_re <= 1'b0;
 	case (current_state)
 	4'b0000: 
 		begin
@@ -106,6 +107,11 @@ always @(posedge clk or posedge reset) begin
 			ctr2_blk=1'b0;
 			ready_r=1'b0;
 			done_r = 1'b0;
+			if(CRC_END)begin
+				next_state <= 4'b1001;
+				ctr1_re <= 1'b1;
+			end
+			else begin
 			if(ctr1_finish) begin
 				if(block_size)begin
 					next_state <= 4'b0100;
@@ -120,6 +126,7 @@ always @(posedge clk or posedge reset) begin
 			end
 			else begin
 				next_state <= 4'b0010;
+			end
 			end
 		end
 		
