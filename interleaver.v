@@ -34,12 +34,29 @@ module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data
 	wire [12:0] pi2_small_value;
 	pi2_small pi2_small_inst (count2, clk, pi2_small_value);
 	
-	wire [12:0] pi1_large_value;
+	wire [12:0] pi2_large_value;
 	pi2_large pi2_large_inst (count2, clk, pi2_large_value);
 	
+	// pi1 mux
+	wire [12:0] pi1_value;
+	assign pi1_value = (p1blocksize) ? (pi1_large_value) : (pi1_small_value);
 	
+	// pi2 mux
+	wire [12:0] pi2_value;
+	assign pi2_value = (p2blocksize) ? (pi2_large_value) : (pi2_small_value);
 	
+	// RAMs
+	// clocked on the negative edge for now -- to discuss
+	// read enable always high for now
+	wire ram1_out;
+	RAM1 RAM1_inst (reset, ~clk, data_in, pi1_value, 1'b1, count1, ram1_we, ram1_out);
 	
+	wire ram2_out;
+	RAM2 RAM2_inst (reset, ~clk, data_in, pi2_value, 1'b1, count2, ram2_we, ram2_out);
 	
-	
+	// final output mux
+	// when p1mode is 1, side 1 is writing, so send data from ram 1
+	// when p1mode is 0, either side 2 is writing, or we don't have valid data, so we can 
+	// just send ram 2 and not assert data_ready if it's not valid data
+	assign data_out = (p1mode) ? (ram1_out) : (ram2_out);
 endmodule
