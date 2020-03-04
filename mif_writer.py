@@ -26,7 +26,7 @@ if (len(sys.argv) == 2):
     
     data_file_str = ""
     for address in range(0, 8192):
-        if address < 6144:
+        if address < K:
             result = (f1 * address + f2 * address**2) % K
         else:
             result = 0
