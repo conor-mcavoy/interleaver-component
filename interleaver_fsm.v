@@ -56,13 +56,17 @@ always @(posedge clk or posedge reset) begin
 			ram2_we=1'b0;
 			ctr1_blk=1'b0;
 			ctr2_blk=1'b0;
+			ctr1_re <= 1'b1;
+			ctr2_re <= 1'b1;
+			ready_r=1'b0;
+			done_r = 1'b0;
 			if(!block_size && CRC_start) begin
 				next_state <= 4'b0001;
-				ctr1_re <= 1'b1; // should we just reset both counters in START anyway?
+				//ctr1_re <= 1'b1; // should we just reset both counters in START anyway?
 			end
 			else if (block_size && CRC_start)begin
 				next_state <= 4'b0010;
-				ctr1_re <= 1'b1;
+				//ctr1_re <= 1'b1;
 			end
 			else begin
 				next_state <= 4'b0000;
@@ -75,10 +79,12 @@ always @(posedge clk or posedge reset) begin
 			p2mode = 1'b0;
 			ctr1_en= 1'b1;
 			ctr2_en= 1'b0;
-			ram1_we=1'b0;
+			ram1_we=1'b1;
 			ram2_we=1'b0;
 			ctr1_blk=1'b0;
 			ctr2_blk=1'b0;
+			ready_r=1'b0;
+			done_r = 1'b0;
 			if(ctr1_finish) begin
 				next_state <= 4'b0111;
 				ctr1_re <= 1'b1;
@@ -94,10 +100,12 @@ always @(posedge clk or posedge reset) begin
 			p2mode = 1'b0;
 			ctr1_en= 1'b1;
 			ctr2_en= 1'b0;
-			ram1_we=1'b0;
+			ram1_we=1'b1;
 			ram2_we=1'b0;
 			ctr1_blk=1'b1;
 			ctr2_blk=1'b0;
+			ready_r=1'b0;
+			done_r = 1'b0;
 			if(ctr1_finish) begin
 				if(block_size)begin
 					next_state <= 4'b0100;
@@ -121,10 +129,12 @@ always @(posedge clk or posedge reset) begin
 			p2mode = 1'b1;
 			ctr1_en= 1'b1;
 			ctr2_en= 1'b1;
-			ram1_we=1'b0;
-			ram2_we=1'b1;
+			ram1_we=1'b1;
+			ram2_we=1'b0;
 			ctr1_blk=1'b1;
 			ctr2_blk=1'b1;
+			ready_r=1'b1;
+			done_r = 1'b0;
 			if(CRC_END) begin
 				next_state <= 4'b1001;
 				ctr1_re <= 1'b1;
@@ -154,10 +164,12 @@ always @(posedge clk or posedge reset) begin
 			p2mode = 1'b0;
 			ctr1_en= 1'b1;
 			ctr2_en= 1'b1;
-			ram1_we=1'b1;
-			ram2_we=1'b0;
+			ram1_we=1'b0;
+			ram2_we=1'b1;
 			ctr1_blk=1'b1;
 			ctr2_blk=1'b1;
+			ready_r=1'b1;
+			done_r = 1'b0;
 			if(CRC_END)begin
 				next_state <= 4'b1010;
 				ctr2_re <=1'b1;
@@ -186,10 +198,12 @@ always @(posedge clk or posedge reset) begin
 			p2mode = 1'b1;
 			ctr1_en= 1'b1;
 			ctr2_en= 1'b1;
-			ram1_we=1'b0;
-			ram2_we=1'b1;
+			ram1_we=1'b1;
+			ram2_we=1'b0;
 			ctr1_blk=1'b0;
 			ctr2_blk=1'b1;
+			ready_r=1'b1;
+			done_r = 1'b0;
 			if(ctr2_finish)begin
 				next_state <=4'b0111;
 				ctr1_re <=1'b1;
@@ -204,10 +218,12 @@ always @(posedge clk or posedge reset) begin
 			p2mode = 1'b0;
 			ctr1_en= 1'b1;
 			ctr2_en= 1'b1;
-			ram1_we=1'b1;
-			ram2_we=1'b0;
+			ram1_we=1'b0;
+			ram2_we=1'b1;
 			ctr1_blk=1'b1;
 			ctr2_blk=1'b0;
+			ready_r=1'b1;
+			done_r = 1'b0;
 			if(ctr1_finish)begin
 				next_state <=4'b1000;
 				ctr2_re <=1'b1;
@@ -222,10 +238,12 @@ always @(posedge clk or posedge reset) begin
 			p2mode = 1'b0;
 			ctr1_en= 1'b1;
 			ctr2_en= 1'b0;
-			ram1_we=1'b1;
+			ram1_we=1'b0;
 			ram2_we=1'b0;
 			ctr1_blk=1'b0;
 			ctr2_blk=1'b0;
+			ready_r=1'b1;
+			done_r = 1'b0;
 			if(ctr1_finish)begin
 				next_state<=4'b1011;
 			end
@@ -240,9 +258,11 @@ always @(posedge clk or posedge reset) begin
 			ctr1_en= 1'b0;
 			ctr2_en= 1'b1;
 			ram1_we=1'b0;
-			ram2_we=1'b1;
+			ram2_we=1'b0;
 			ctr1_blk=1'b0;
 			ctr2_blk=1'b0;
+			ready_r=1'b1;
+			done_r = 1'b0;
 			if(ctr2_finish)begin
 				next_state<=4'b1011;
 			end
@@ -256,10 +276,12 @@ always @(posedge clk or posedge reset) begin
 			p2mode = 1'b0;
 			ctr1_en= 1'b1;
 			ctr2_en= 1'b0;
-			ram1_we=1'b1;
+			ram1_we=1'b0;
 			ram2_we=1'b0;
 			ctr1_blk=1'b1;
 			ctr2_blk=1'b0;
+			ready_r=1'b1;
+			done_r = 1'b0;
 			if(ctr1_finish)begin
 				next_state<=4'b1011;
 			end
@@ -274,9 +296,11 @@ always @(posedge clk or posedge reset) begin
 			ctr1_en= 1'b0;
 			ctr2_en= 1'b1;
 			ram1_we=1'b0;
-			ram2_we=1'b1;
+			ram2_we=1'b0;
 			ctr1_blk=1'b0;
 			ctr2_blk=1'b1;
+			ready_r=1'b1;
+			done_r = 1'b0;
 			if(ctr2_finish)begin
 				next_state<=4'b1011;
 			end
@@ -292,8 +316,8 @@ always @(posedge clk or posedge reset) begin
 			ctr2_en= 1'b0;
 			ram1_we=1'b0;
 			ram2_we=1'b0;
-			next_state<=4'b1010;
-			ready_r=1'b1;
+			next_state<=4'b1100;
+			ready_r=1'b0;
 			done_r = 1'b1;
 			ctr1_blk=1'b0;
 			ctr2_blk=1'b0;
@@ -310,6 +334,8 @@ always @(posedge clk or posedge reset) begin
 			ctr2_blk=1'b0;
 			//wait for something .... go back to 0000
 			next_state<=4'b0000;
+			ready_r=1'b0;
+			done_r = 1'b1;
 		end
 	endcase
 	end
