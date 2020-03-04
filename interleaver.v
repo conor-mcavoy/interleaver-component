@@ -15,9 +15,11 @@ module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data
 	output counter1_done, counter1_reset;
 	wire counter1_done, counter2_done; // asserted when counters have reached their targets
 	wire p1blocksize, p2blocksize; // 0 for small, 1 for large
-	interleaver_fsm FSM (clk, reset, CRC_blocksize, next_state, state, CRC_start, data_in, CRC_end, data_ready,
+	wire fsm_ready; // need to delay this ready signal by one clock cycle
+	interleaver_fsm FSM (clk, reset, CRC_blocksize, next_state, state, CRC_start, data_in, CRC_end, fsm_ready,
 	                     done, p1mode, p2mode, counter1_reset, counter2_reset, counter1_enable,
 								counter2_enable, ram1_we, ram2_we, counter1_done, counter2_done, p1blocksize, p2blocksize);
+	dff ready_delay (fsm_ready, clk, ~reset, 1'b1, data_ready);
 	
 	output [12:0] count1;
 	wire [12:0] count1;
@@ -51,11 +53,17 @@ module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data
 	// RAMs
 	// clocked on the negative edge for now -- to discuss
 	// read enable always high for now
+	
+	// similarl to the delay on the ready signal, we need to delay the data by one cycle
+	wire delayed_data_in1, delayed_data_in2;
+	dff data_delay1 (data_in, clk, ~reset, 1'b1, delayed_data_in1);
+	dff data_delay2 (delayed_data_in1, clk, ~reset, 1'b1, delayed_data_in2);
+	
 	wire ram1_out;
-	RAM1 RAM1_inst (reset, clk, data_in, pi1_value, 1'b1, count1, ram1_we, ram1_out);
+	RAM1 RAM1_inst (reset, clk, delayed_data_in2, pi1_value, 1'b1, count1, ram1_we, ram1_out);
 	
 	wire ram2_out;
-	RAM2 RAM2_inst (reset, clk, data_in, pi2_value, 1'b1, count2, ram2_we, ram2_out);
+	RAM2 RAM2_inst (reset, clk, delayed_data_in2, pi2_value, 1'b1, count2, ram2_we, ram2_out);
 	
 	// final output mux
 	// when p1mode is 1, side 1 is writing, so send data from ram 1

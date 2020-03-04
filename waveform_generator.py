@@ -17,6 +17,9 @@ if (len(sys.argv) == 4):
 
     if l_or_s == "l":
         blocksize = 6144
+        f1 = 263
+        f2 = 480
+        K = 6144
     elif l_or_s == "s":
         blocksize = 1056
         f1 = 17

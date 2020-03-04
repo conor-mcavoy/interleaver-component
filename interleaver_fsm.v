@@ -253,6 +253,7 @@ always @(posedge clk or posedge reset) begin
 			done_r = 1'b0;
 			if(ctr1_finish)begin
 				next_state<=4'b1011;
+				ready_r=1'b0;
 			end
 			else begin
 				next_state <=4'b0111;
@@ -272,6 +273,7 @@ always @(posedge clk or posedge reset) begin
 			done_r = 1'b0;
 			if(ctr2_finish)begin
 				next_state<=4'b1011;
+				ready_r=1'b0;
 			end
 			else begin
 				next_state <=4'b1000;
@@ -291,6 +293,7 @@ always @(posedge clk or posedge reset) begin
 			done_r = 1'b0;
 			if(ctr1_finish)begin
 				next_state<=4'b1011;
+				ready_r=1'b0;
 			end
 			else begin
 				next_state <=4'b1001;
@@ -310,6 +313,7 @@ always @(posedge clk or posedge reset) begin
 			done_r = 1'b0;
 			if(ctr2_finish)begin
 				next_state<=4'b1011;
+				ready_r=1'b0;
 			end
 			else begin
 				next_state <=4'b1010;
