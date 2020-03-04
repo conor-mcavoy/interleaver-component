@@ -1,4 +1,5 @@
-module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data_out, data_ready, done);
+module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data_out, data_ready,
+                    done, next_state, state, counter1_done, counter1_reset);
 	input data_in;
 	input clk, reset;
 	input CRC_start, CRC_blocksize, CRC_end; // control signals
@@ -6,14 +7,15 @@ module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data
 	output data_out;
 	output data_ready, done; // control signals
 	
-	wire [3:0] test1, test2;
+	output [3:0] state, next_state;
 	wire p1mode, p2mode; // 0 for reading, 1 for writing
 	wire counter1_reset, counter2_reset; // local resets (will still be triggered on global reset)
 	wire counter1_enable, counter2_enable;
 	wire ram1_we, ram2_we; // RAM write enables
+	output counter1_done, counter1_reset;
 	wire counter1_done, counter2_done; // asserted when counters have reached their targets
 	wire p1blocksize, p2blocksize; // 0 for small, 1 for large
-	interleaver_fsm FSM (clk, reset, CRC_blocksize, test1, test2, CRC_start, data_in, CRC_end, data_ready,
+	interleaver_fsm FSM (clk, reset, CRC_blocksize, next_state, state, CRC_start, data_in, CRC_end, data_ready,
 	                     done, p1mode, p2mode, counter1_reset, counter2_reset, counter1_enable,
 								counter2_enable, ram1_we, ram2_we, counter1_done, counter2_done, p1blocksize, p2blocksize);
 	
