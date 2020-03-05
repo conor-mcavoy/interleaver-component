@@ -145,6 +145,7 @@ always @(posedge clk or posedge reset) begin
 			if(CRC_END) begin
 				next_state <= 4'b1001;
 				ctr1_re <= 1'b1;
+				ready_r=1'b0;
 			end
 			else begin
 			if(ctr1_finish && ctr2_finish) begin
@@ -152,11 +153,13 @@ always @(posedge clk or posedge reset) begin
 					next_state <= 4'b0100;
 					ctr1_re <=1'b1;
 					ctr2_re<=1'b1;
+					ready_r=1'b0;
 				end
 				else begin
 					next_state <= 4'b0110;
 					ctr1_re <=1'b1;
 					ctr2_re<=1'b1;
+					ready_r=1'b0;
 				end
 			end
 			else begin
@@ -180,6 +183,7 @@ always @(posedge clk or posedge reset) begin
 			if(CRC_END)begin
 				next_state <= 4'b1010;
 				ctr2_re <=1'b1;
+				ready_r=1'b0;
 			end
 			else begin
 				if(ctr1_finish && ctr2_finish)begin
@@ -187,11 +191,14 @@ always @(posedge clk or posedge reset) begin
 						next_state <= 4'b0011;
 						ctr1_re <=1'b1;
 						ctr2_re<=1'b1;
+						ready_r=1'b0;
 					end
+
 					else begin
 						next_state<=4'b0101;
 						ctr1_re <=1'b1;
 						ctr2_re<=1'b1;
+						ready_r=1'b0;
 					end
 				end
 				else begin
@@ -214,6 +221,7 @@ always @(posedge clk or posedge reset) begin
 			if(ctr2_finish)begin
 				next_state <=4'b0111;
 				ctr1_re <=1'b1;
+				ready_r=1'b0;
 			end	
 			else begin
 				next_state <=4'b0101;
@@ -234,6 +242,7 @@ always @(posedge clk or posedge reset) begin
 			if(ctr1_finish)begin
 				next_state <=4'b1000;
 				ctr2_re <=1'b1;
+				ready_r=1'b0;
 			end	
 			else begin
 				next_state <=4'b0110;
