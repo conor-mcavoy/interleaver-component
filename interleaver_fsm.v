@@ -3,7 +3,7 @@ module interleaver_fsm(clk,reset,block_size,next_state_w,state_w,CRC_start,CRC_d
 		input block_size;
 		input CRC_start;
 		input CRC_data;
-		input CRC_END;
+		input CRC_END; //CRC_END signal can be ignored, system will work if its always 0, leave it here just in case we need it in the future
 		input ctr1_finish;
 		input ctr2_finish;
 		output[3:0] state_w,next_state_w;
@@ -47,6 +47,27 @@ always @(posedge clk or posedge reset) begin
 	ctr1_re <= 1'b0;
 	ctr2_re <= 1'b0;
 	case (current_state)
+	4‘b1101：
+		begin
+			p1mode = 1'b0;
+			p2mode = 1'b0;
+			ctr1_en= 1'b0;
+			ctr2_en= 1'b0;
+			ram1_we=1'b0;
+			ram2_we=1'b0;
+			ctr1_blk=1'b0;
+			ctr2_blk=1'b0;
+			ctr1_re <= 1'b1;
+			ctr2_re <= 1'b1;
+			ready_r=1'b0;
+			done_r = 1'b0;
+			if(CRC_start)begin
+				next_state<=4'b0000;
+			end
+			else begin
+				next_state <= 4'b1101;
+			end
+		end
 	4'b0000: 
 		begin
 			p1mode = 1'b0;
@@ -61,11 +82,11 @@ always @(posedge clk or posedge reset) begin
 			ctr2_re <= 1'b1;
 			ready_r=1'b0;
 			done_r = 1'b0;
-			if(!block_size && CRC_start) begin
+			if(!block_size ) begin
 				next_state <= 4'b0001;
 				//ctr1_re <= 1'b1; // should we just reset both counters in START anyway?
 			end
-			else if (block_size && CRC_start)begin
+			else if (block_size )begin
 				next_state <= 4'b0010;
 				//ctr1_re <= 1'b1;
 			end
@@ -353,7 +374,7 @@ always @(posedge clk or posedge reset) begin
 			ctr1_blk=1'b0;
 			ctr2_blk=1'b0;
 			//wait for something .... go back to 0000
-			next_state<=4'b0000;
+			next_state<=4'b1101;
 			ready_r=1'b0;
 			done_r = 1'b1;
 		end
