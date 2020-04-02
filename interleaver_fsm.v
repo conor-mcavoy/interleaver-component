@@ -47,7 +47,7 @@ always @(posedge clk or posedge reset) begin
 	ctr1_re <= 1'b0;
 	ctr2_re <= 1'b0;
 	case (current_state)
-	4‘b1101：
+	4'b1101:
 		begin
 			p1mode = 1'b0;
 			p2mode = 1'b0;
