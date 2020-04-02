@@ -20,7 +20,7 @@ wire[15:0] ctr1_counter,ctr2_counter;
 reg ready_r, done_r;
  
 initial begin
-	current_state = 4'b0000;
+	current_state = 4'b1101;
 	ready_r = 1'b0;
 	done_r = 1'b0;
 	p1mode = 1'b0;
@@ -38,7 +38,7 @@ end
 
 always @(posedge clk or posedge reset) begin
 	if(reset) begin
-		current_state <= 4'b0000;
+		current_state <= 4'b1101;
 		ctr2_re <= 1'b1;
 		ctr1_re = 1'b1;
 	end
