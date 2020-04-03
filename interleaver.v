@@ -1,11 +1,11 @@
-module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data_out, data_ready,
+module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data_out, data_ready2,
                     done, next_state, state, counter1_done, counter1_reset, count1,pi1_small_value, pi1_value_test,target1,target2);
 	input data_in;
 	input clk, reset;
 	input CRC_start, CRC_blocksize, CRC_end; // control signals
 	output[12:0] pi1_value_test;
 	output data_out;
-	output data_ready, done; // control signals
+	output data_ready2, done; // control signals
 	output[12:0] target1,target2;
 	
 	output [3:0] state, next_state;
@@ -20,7 +20,8 @@ module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data
 	interleaver_fsm FSM (clk, reset, CRC_blocksize, next_state, state, CRC_start, data_in, CRC_end, fsm_ready,
 	                     done, p1mode, p2mode, counter1_reset, counter2_reset, counter1_enable,
 								counter2_enable, ram1_we, ram2_we, counter1_done, counter2_done, p1blocksize, p2blocksize);
-	dff ready_delay (fsm_ready, clk, ~reset, 1'b1, data_ready);
+	dff ready_delay (fsm_ready, clk, ~reset, 1'b1, data_ready1);
+	dff ready_delay1 (data_ready1, clk, ~reset, 1'b1, data_ready2);
 	
 	output [12:0] count1;
 	wire [12:0] count1;
@@ -61,10 +62,10 @@ module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data
 	dff data_delay2 (delayed_data_in1, clk, ~reset, 1'b1, delayed_data_in2);
 	
 	wire ram1_out;
-	RAM1 RAM1_inst (reset, clk, delayed_data_in2, pi1_value, 1'b1, count1, ram1_we, ram1_out);
+	RAM1 RAM1_inst (reset, clk, delayed_data_in1, pi1_value, 1'b1, count1, ram1_we, ram1_out);
 	
 	wire ram2_out;
-	RAM2 RAM2_inst (reset, clk, delayed_data_in2, pi2_value, 1'b1, count2, ram2_we, ram2_out);
+	RAM2 RAM2_inst (reset, clk, delayed_data_in1, pi2_value, 1'b1, count2, ram2_we, ram2_out);
 	
 	// final output mux
 	// when p1mode is 1, side 1 is writing, so send data from ram 1

@@ -38,6 +38,14 @@ if (len(sys.argv) == 4):
     check_str = ""
     check2_str = ""
     check3_str = ""
+    check4_str = ""
+    check5_str = ""
+    check6_str = ""
+    check7_str = ""
+    check8_str = ""
+    check9_str = ""
+    check10_str = ""
+
     for i in range(blocksize):
         pi_of_i = (f1 * i + f2 * i**2) % K
         check_str += str(data_list[pi_of_i])
@@ -47,7 +55,13 @@ if (len(sys.argv) == 4):
         
         #pi_of_i = (f1 * (i+1) + f2 * (i+1)**2) % K
         check3_str += str(data_list[(pi_of_i+1)%K])
-
+        check4_str += str(data_list[(pi_of_i+2)%K])
+        check5_str += str(data_list[(pi_of_i+3)%K])
+        check6_str += str(data_list[(pi_of_i+4)%K])
+        check7_str += str(data_list[(pi_of_i+5)%K])
+        check8_str += str(data_list[(pi_of_i+6)%K])
+        check9_str += str(data_list[(pi_of_i+7)%K])
+        check10_str += str(data_list[(pi_of_i+8)%K])
     print("Writing waveform file: " + waveform_filename)
     f = open(waveform_filename, 'w');
     f.write(wvf_str)
@@ -58,6 +72,13 @@ if (len(sys.argv) == 4):
     f.write(check_str + "\n\n")
     f.write(check2_str + "\n\n")
     f.write(check3_str + "\n\n")
+    f.write(check4_str + "\n\n")
+    f.write(check5_str + "\n\n")
+    f.write(check6_str + "\n\n")
+    f.write(check7_str + "\n\n")
+    f.write(check8_str + "\n\n")
+    f.write(check9_str + "\n\n")
+    f.write(check10_str + "\n\n")
     f.close()
 
     print("Done")
