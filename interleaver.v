@@ -1,5 +1,5 @@
 module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data_out, data_ready2,
-                    done, next_state, state, counter1_done, counter1_reset, count1,pi1_small_value, pi1_value_test,target1,target2);
+                    done, next_state, state, counter1_done, counter1_reset, count1,pi1_small_value, pi1_value_test,target1,target2,counter2_done,counter2_reset);
 	input data_in;
 	input clk, reset;
 	input CRC_start, CRC_blocksize, CRC_end; // control signals
@@ -13,11 +13,11 @@ module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data
 	wire counter1_reset, counter2_reset; // local resets (will still be triggered on global reset)
 	wire counter1_enable, counter2_enable;
 	wire ram1_we, ram2_we; // RAM write enables
-	output counter1_done, counter1_reset;
+	output counter1_done, counter1_reset,counter2_done,counter2_reset;
 	wire counter1_done, counter2_done; // asserted when counters have reached their targets
 	wire p1blocksize, p2blocksize; // 0 for small, 1 for large
 	wire fsm_ready; // need to delay this ready signal by one clock cycle
-	interleaver_fsm FSM (clk, reset, CRC_blocksize, next_state, state, CRC_start, data_in, CRC_end, fsm_ready,
+	interleaver_fsm_new FSM (clk, reset, CRC_blocksize, next_state, state, CRC_start, data_in, CRC_end, fsm_ready,
 	                     done, p1mode, p2mode, counter1_reset, counter2_reset, counter1_enable,
 								counter2_enable, ram1_we, ram2_we, counter1_done, counter2_done, p1blocksize, p2blocksize);
 	dff ready_delay (fsm_ready, clk, ~reset, 1'b1, data_ready1);
