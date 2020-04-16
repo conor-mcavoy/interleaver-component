@@ -1,42 +1,48 @@
 module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data_out, data_ready2,
-                    done, next_state, state, counter1_done, counter1_reset, count1,pi1_small_value, pi1_value_test,target1,target2,counter2_done,counter2_reset);
+                    done, offset);//, next_state, state, counter1_done, counter1_reset, count1,pi1_small_value, pi1_value_test,target1,target2,counter2_done,counter2_reset);
 	input data_in;
 	input clk, reset;
 	input CRC_start, CRC_blocksize, CRC_end; // control signals
-	output[12:0] pi1_value_test;
+	input [2:0] offset;
+	
 	output data_out;
 	output data_ready2, done; // control signals
-	output[12:0] target1,target2;
 	
-	output [3:0] state, next_state;
+	// debug signals
+	//output[12:0] target1,target2;
+	//output[12:0] pi1_value_test;
+	//output [3:0] state, next_state;
+	//output counter1_done, counter1_reset,counter2_done,counter2_reset;
+	//output [12:0] count1;
+	//output [12:0] pi1_small_value;
+	
+	
 	wire p1mode, p2mode; // 0 for reading, 1 for writing
 	wire counter1_reset, counter2_reset; // local resets (will still be triggered on global reset)
 	wire counter1_enable, counter2_enable;
 	wire ram1_we, ram2_we; // RAM write enables
-	output counter1_done, counter1_reset,counter2_done,counter2_reset;
 	wire counter1_done, counter2_done; // asserted when counters have reached their targets
 	wire p1blocksize, p2blocksize; // 0 for small, 1 for large
 	wire fsm_ready; // need to delay this ready signal by one clock cycle
 	interleaver_fsm_new FSM (clk, reset, CRC_blocksize, next_state, state, CRC_start, data_in, CRC_end, fsm_ready,
 	                     done, p1mode, p2mode, counter1_reset, counter2_reset, counter1_enable,
 								counter2_enable, ram1_we, ram2_we, counter1_done, counter2_done, p1blocksize, p2blocksize);
+	wire data_ready1;
 	dff ready_delay (fsm_ready, clk, ~reset, 1'b1, data_ready1);
 	dff ready_delay1 (data_ready1, clk, ~reset, 1'b1, data_ready2);
 	
-	output [12:0] count1;
+	
 	wire [12:0] count1;
-	counter_wrapper1 counter_wrapper1_inst (counter1_enable, p1blocksize, clk, counter1_reset, count1, counter1_done,target1);
+	counter_wrapper1 counter_wrapper1_inst (counter1_enable, p1blocksize, clk, counter1_reset, count1, counter1_done, offset);
 	
 	wire [12:0] pi1_small_value;
-	output [12:0] pi1_small_value;
 	pi1_small pi1_small_inst (count1, ~clk, pi1_small_value);
 	
 	wire [12:0] pi1_large_value;
 	pi1_large pi1_large_inst (count1, ~clk, pi1_large_value);
 	
-	
 	wire [12:0] count2;
-	counter_wrapper2 counter_wrapper2_inst (counter2_enable, p2blocksize, clk, counter2_reset, count2, counter2_done,target2);
+	counter_wrapper2 counter_wrapper2_inst (counter2_enable, p2blocksize, clk, counter2_reset, count2, counter2_done, offset);
 	
 	wire [12:0] pi2_small_value;
 	pi2_small pi2_small_inst (count2, ~clk, pi2_small_value);
@@ -47,7 +53,8 @@ module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data
 	// pi1 mux
 	wire [12:0] pi1_value;
 	assign pi1_value = (p1blocksize) ? (pi1_large_value) : (pi1_small_value);
-	assign pi1_value_test = pi1_value;
+	//assign pi1_value_test = pi1_value;
+	
 	// pi2 mux
 	wire [12:0] pi2_value;
 	assign pi2_value = (p2blocksize) ? (pi2_large_value) : (pi2_small_value);
