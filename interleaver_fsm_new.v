@@ -54,7 +54,7 @@ end
 	end
 end
 
-always @(current_state,CRC_start,CRC_data,block_size,ctr1_finish,ctr2_finish,CRC_END) begin
+always @(current_state,CRC_start,CRC_data,block_size,ctr1_finish,ctr2_finish) begin
 	case(current_state)
 		4'b0000: begin
 			p1mode = 1'b0;
@@ -259,25 +259,10 @@ always @(current_state,CRC_start,CRC_data,block_size,ctr1_finish,ctr2_finish,CRC
 			ctr1_blk=1'b0;
 			ctr2_blk=1'b0;
 			//wait for something .... go back to 0000
-			next_state<=4'b1010;
-			ready_r=1'b0;
-			done_r = 1'b1;
-		end
-		4'b1010: begin
-			p1mode = 1'b0;
-			p2mode = 1'b0;
-			ctr1_en= 1'b0;
-			ctr2_en= 1'b0;
-			ram1_we=1'b0;
-			ram2_we=1'b0;
-			ctr1_blk=1'b0;
-			ctr2_blk=1'b0;
-			//wait for something .... go back to 0000
 			next_state<=4'b0000;
 			ready_r=1'b0;
 			done_r = 1'b1;
 		end
-		
 	endcase
 end
 assign done = done_r;
@@ -288,8 +273,7 @@ assign ctr1_re_w = ctr1_re;
 assign ctr2_re_w = ctr2_re;
 assign ctr1_en_w = ctr1_en;
 assign ctr2_en_w = ctr2_en;
-dff data_delay2 (ram1_we, clk, ~reset, 1'b1, ram1_we_w);
-//assign ram1_we_w = ram1_we;
+assign ram1_we_w = ram1_we;
 assign ram2_we_w = ram2_we;
 assign state_w = current_state;
 assign next_state_w = next_state;
