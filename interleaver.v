@@ -1,17 +1,17 @@
 module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data_out, data_ready2,
-                    done, offset);//, next_state, state, counter1_done, counter1_reset, count1,pi1_small_value, pi1_value_test,target1,target2,counter2_done,counter2_reset);
+                    done, offset,state,next_state,data_in_port,r2_out,r1_out,p1mode_w,r1_wetest,count1_test,pi1_value_test,pi2_value_test,count2_test,counter1_reset);//, next_state, state, counter1_done, counter1_reset, count1,pi1_small_value, pi1_value_test,target1,target2,counter2_done,counter2_reset);
 	input data_in;
 	input clk, reset;
 	input CRC_start, CRC_blocksize, CRC_end; // control signals
 	input [2:0] offset;
 	
-	output data_out;
-	output data_ready2, done; // control signals
+	output data_out,data_in_port,r2_out,r1_out,p1mode_w,r1_wetest;
+	output data_ready2, done,counter1_reset; // control signals
 	
 	// debug signals
 	//output[12:0] target1,target2;
-	//output[12:0] pi1_value_test;
-	//output [3:0] state, next_state;
+	output[12:0] count1_test,pi1_value_test,pi2_value_test,count2_test;
+	output [3:0] state, next_state;
 	//output counter1_done, counter1_reset,counter2_done,counter2_reset;
 	//output [12:0] count1;
 	//output [12:0] pi1_small_value;
@@ -28,6 +28,7 @@ module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data
 	                     done, p1mode, p2mode, counter1_reset, counter2_reset, counter1_enable,
 								counter2_enable, ram1_we, ram2_we, counter1_done, counter2_done, p1blocksize, p2blocksize);
 	wire data_ready1;
+	
 	dff ready_delay (fsm_ready, clk, ~reset, 1'b1, data_ready1);
 	dff ready_delay1 (data_ready1, clk, ~reset, 1'b1, data_ready2);
 	
@@ -38,27 +39,27 @@ module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data
 	wire [12:0] pi1_small_value;
 	pi1_small pi1_small_inst (count1, ~clk, pi1_small_value);
 	
-	wire [12:0] pi1_large_value;
-	pi1_large pi1_large_inst (count1, ~clk, pi1_large_value);
+//	wire [12:0] pi1_large_value;
+//	pi1_large pi1_large_inst (count1, ~clk, pi1_large_value);
 	
 	wire [12:0] count2;
 	counter_wrapper2 counter_wrapper2_inst (counter2_enable, p2blocksize, clk, counter2_reset, count2, counter2_done, offset);
 	
-	wire [12:0] pi2_small_value;
-	pi2_small pi2_small_inst (count2, ~clk, pi2_small_value);
+//	wire [12:0] pi2_small_value;
+//	pi2_small pi2_small_inst (count2, ~clk, pi2_small_value);
 	
 	wire [12:0] pi2_large_value;
 	pi2_large pi2_large_inst (count2, ~clk, pi2_large_value);
 	
 	// pi1 mux
 	wire [12:0] pi1_value;
-	assign pi1_value = (p1blocksize) ? (pi1_large_value) : (pi1_small_value);
-	//assign pi1_value_test = pi1_value;
+	//assign pi1_value = (p1blocksize) ? (pi1_large_value) : (pi1_small_value);
+	assign pi1_value = pi1_small_value;
 	
 	// pi2 mux
 	wire [12:0] pi2_value;
-	assign pi2_value = (p2blocksize) ? (pi2_large_value) : (pi2_small_value);
-	
+	//assign pi2_value = (p2blocksize) ? (pi2_large_value) : (pi2_small_value);
+	assign pi2_value = pi2_large_value;
 	// RAMs
 	// clocked on the negative edge for now -- to discuss
 	// read enable always high for now
@@ -78,5 +79,14 @@ module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data
 	// when p1mode is 1, side 1 is writing, so send data from ram 1
 	// when p1mode is 0, either side 2 is writing, or we don't have valid data, so we can 
 	// just send ram 2 and not assert data_ready if it's not valid data
+	assign data_in_port = delayed_data_in1;
+	assign count1_test = count1;
+	assign count2_test = count2;
+	assign pi1_value_test = pi1_value;
+	assign pi2_value_test = pi2_value;
+	assign r1_out = ram1_out;
+	assign r2_out = ram2_out;
+	assign r1_wetest= ram1_we;
+	assign p1mode_w=p1mode;
 	assign data_out = (p1mode) ? (ram1_out) : (ram2_out);
 endmodule
