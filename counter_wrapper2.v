@@ -14,8 +14,9 @@ module counter_wrapper2 (count_enable, block_size, clk, reset, count, target_rea
 	
 	wire[9:0] q;
 	wire [12:0] target_check;
-	assign count[12:3] = q;
-	assign count[2:0] = offset;
+	assign count = {q,offset};
+//	assign count[12:3] = q;
+//	assign count[2:0] = offset;
 	
 	//xor (target_check[0 ], target[0 ], q[0 ]);
 	//xor (target_check[1 ], target[1 ], q[1 ]);
