@@ -1,8 +1,7 @@
-module interleaver_fsm_new(clk,reset,block_size,next_state_w,state_w,CRC_start,CRC_data,CRC_END,ready,done,p1mode_w,p2mode_w,ctr1_re_w,ctr2_re_w,ctr1_en_w,ctr2_en_w,ram1_we_w,ram2_we_w,ctr1_finish,ctr2_finish,ctr1_blk,ctr2_blk);
+module interleaver_fsm_new(clk,reset,block_size,next_state_w,state_w,CRC_start,CRC_END,ready,done,p1mode_w,p2mode_w,ctr1_re_w,ctr2_re_w,ctr1_en_w,ctr2_en_w,ram1_we_w,ram2_we_w,ctr1_finish,ctr2_finish,ctr1_blk,ctr2_blk);
 		input clk, reset;
 		input block_size;
 		input CRC_start;
-		input CRC_data;
 		input CRC_END; //CRC_END signal can be ignored, system will work if its always 0, leave it here just in case we need it in the future
 		input ctr1_finish;
 		input ctr2_finish;
@@ -54,7 +53,7 @@ end
 	end
 end
 
-always @(current_state,CRC_start,CRC_data,block_size,ctr1_finish,ctr2_finish,CRC_END) begin
+always @(current_state,CRC_start,block_size,ctr1_finish,ctr2_finish,CRC_END) begin
 	case(current_state)
 		4'b0000: begin
 			p1mode = 1'b0;
@@ -76,7 +75,7 @@ always @(current_state,CRC_start,CRC_data,block_size,ctr1_finish,ctr2_finish,CRC
 				next_state <= 4'b0000;
 			end
 		end
-		4'b1001: begin
+		4'b1001: begin //without thisone, large blk is working 
 			p1mode = 1'b0;
 			p2mode = 1'b0;
 			ctr1_en= 1'b0;
@@ -130,8 +129,8 @@ always @(current_state,CRC_start,CRC_data,block_size,ctr1_finish,ctr2_finish,CRC
 			else begin	
 				ready_r=1'b1;
 			end
-			if(CRC_END )begin
-				next_state<=4'b0101;
+			if(CRC_END &ctr2_finish)begin
+				next_state<=4'b1011;
 				//ctr1_re <=1'b1;
 				//ctr2_re <=1'b1;
 			end
@@ -145,6 +144,22 @@ always @(current_state,CRC_start,CRC_data,block_size,ctr1_finish,ctr2_finish,CRC
 			
 			end
 		end
+		
+		4'b1011: begin
+			p1mode = 1'b0;
+			p2mode = 1'b0;
+			ctr1_en= 1'b0;
+			ctr2_en= 1'b0;
+			ram1_we=1'b0;
+			ram2_we=1'b0;
+			ctr1_blk=1'b0;
+			ctr2_blk=1'b0;
+			//wait for something .... go back to 0000
+			next_state<=4'b0101;
+			ready_r=1'b0;
+			done_r = 1'b0;
+		end
+		
 		4'b0011: begin
 			p1mode = 1'b0;
 			p2mode = 1'b1;

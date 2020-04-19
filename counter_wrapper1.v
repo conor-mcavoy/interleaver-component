@@ -1,8 +1,7 @@
-module counter_wrapper1 (count_enable, block_size, clk, reset, count, target_reached, offset);
+module counter_wrapper1 (count_enable, block_size, clk, reset, count, target_reached);
 	input count_enable;
 	input block_size; // 0 for small and 1 for large
 	input clk, reset;
-	input [2:0] offset;
 	
 	output [12:0] count;
 	output target_reached;
@@ -46,5 +45,5 @@ module counter_wrapper1 (count_enable, block_size, clk, reset, count, target_rea
 	and (enable, count_enable, ~target_reached);
 	
 	counter1 counter1_inst (reset, enable, clk, q);
-	assign count = {q,offset};
+	assign count = {q,3'd0};
 endmodule

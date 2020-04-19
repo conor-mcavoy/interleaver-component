@@ -1,8 +1,8 @@
-module counter_wrapper2 (count_enable, block_size, clk, reset, count, target_reached, offset);
+module counter_wrapper2 (count_enable, block_size, clk, reset, count, target_reached);
 	input count_enable;
 	input block_size; // 0 for small and 1 for large
 	input clk, reset;
-	input [2:0] offset;
+	
 	
 	output [12:0] count;
 	output target_reached;
@@ -14,7 +14,7 @@ module counter_wrapper2 (count_enable, block_size, clk, reset, count, target_rea
 	
 	wire[9:0] q;
 	wire [12:0] target_check;
-	assign count = {q,offset};
+	assign count = {q,3'd0};
 //	assign count[12:3] = q;
 //	assign count[2:0] = offset;
 	

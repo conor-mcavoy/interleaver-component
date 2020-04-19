@@ -37,12 +37,17 @@ if (len(sys.argv) == 4):
     wvf_str6 = ""
     wvf_str7 = ""
     wvf_str8 = ""
+    wvf_hexallstr = ""
+    wvf_hexallbit=""
     data_list = []
     for i in range(blocksize):
         level = random.randint(0, 1) # random 0 or 1
         data_list.append(level)
+        wvf_hexallstr += str(level);
     index =0
     size_result = blocksize/8;
+    hex_result = blocksize/4;
+    '''
     while index<size_result:
         wvf_str0 += "\t\tLEVEL " + str(data_list[index*8+0]) + " FOR 5.0;\n"
         wvf_str1 += "\t\tLEVEL " + str(data_list[index*8+1]) + " FOR 5.0;\n"
@@ -53,46 +58,65 @@ if (len(sys.argv) == 4):
         wvf_str6 += "\t\tLEVEL " + str(data_list[index*8+6]) + " FOR 5.0;\n"
         wvf_str7 += "\t\tLEVEL " + str(data_list[index*8+7]) + " FOR 5.0;\n"
         index=index+1
+    '''
 
-    
+    while index<size_result:
+        wvf_str0 += str(data_list[index*8+0])
+        wvf_str1 += str(data_list[index*8+1])
+        wvf_str2 += str(data_list[index*8+2])
+        wvf_str3 += str(data_list[index*8+3]) 
+        wvf_str4 += str(data_list[index*8+4]) 
+        wvf_str5 += str(data_list[index*8+5])
+        wvf_str6 += str(data_list[index*8+6])
+        wvf_str7 += str(data_list[index*8+7])
+        index=index+1
+
+    index0=0
+    while index0<hex_result:
+        wvf_hexallbit += str(hex(int(  str(wvf_hexallstr[index0*4:(index0+1)*4])[::-1]  ,2)))[2]
+        index0=index0+1
+
+    in_hex=0;
+    tmp=""
+    while in_hex<len(wvf_hexallbit):
+        tmp += wvf_hexallbit[in_hex:in_hex+2][::-1]
+        in_hex=in_hex+2;
+
+    wvf_hex0 = int(wvf_str0,base=16)
+    wvf_hex1 = int(wvf_str1,base=16)
+    wvf_hex2 = int(wvf_str2,base=16)
+    wvf_hex3 = int(wvf_str3,base=16)
+    wvf_hex4 = int(wvf_str4,base=16)
+    wvf_hex5 = int(wvf_str5,base=16)
+    wvf_hex6 = int(wvf_str6,base=16)
+    wvf_hex7 = int(wvf_str7,base=16)
+   
+
     check_str = ""
     check2_str = ""
     check3_str = ""
-    check4_str = ""
-    check5_str = ""
-    check6_str = ""
-    check7_str = ""
-    check8_str = ""
-    check9_str = ""
-    check10_str = ""
-
     for i in range(blocksize):
         pi_of_i = (f1 * i + f2 * i**2) % K
         check_str += str(data_list[pi_of_i])
         
         #pi_of_i = (f1 * (i-1) + f2 * (i-1)**2) % K
-        check2_str += str(data_list[(pi_of_i-1)%K])
+        check2_str += str(data_list[(pi_of_i-8)%K])
         
         #pi_of_i = (f1 * (i+1) + f2 * (i+1)**2) % K
-        check3_str += str(data_list[(pi_of_i+1)%K])
-        check4_str += str(data_list[(pi_of_i+2)%K])
-        check5_str += str(data_list[(pi_of_i+3)%K])
-        check6_str += str(data_list[(pi_of_i+4)%K])
-        check7_str += str(data_list[(pi_of_i+5)%K])
-        check8_str += str(data_list[(pi_of_i+6)%K])
-        check9_str += str(data_list[(pi_of_i+7)%K])
-        check10_str += str(data_list[(pi_of_i+8)%K])
+        check3_str += str(data_list[(pi_of_i+8)%K])
+        
 
     print("Writing waveform file: " + waveform_filename)
     f = open(waveform_filename, 'w');
-    f.write(wvf_str0+ "\n end of bit 0 \n")
-    f.write(wvf_str1+ "\n end of bit 1 \n")
-    f.write(wvf_str2+ "\n end of bit 2 \n")
-    f.write(wvf_str3+ "\n end of bit 3 \n")
-    f.write(wvf_str4+ "\n end of bit 4 \n")
-    f.write(wvf_str5+ "\n end of bit 5 \n")
-    f.write(wvf_str6+ "\n end of bit 6 \n")
-    f.write(wvf_str7+ "\n end of bit 7 \n")
+    f.write(tmp+ "\n hex input\n")
+    f.write(str(wvf_str0)+ "\n end of bit 0 \n")
+    f.write(str(wvf_str1)+ "\n end of bit 1 \n")
+    f.write(str(wvf_str2)+ "\n end of bit 2 \n")
+    f.write(str(wvf_str3)+ "\n end of bit 3 \n")
+    f.write(str(wvf_str4)+ "\n end of bit 4 \n")
+    f.write(str(wvf_str5)+ "\n end of bit 5 \n")
+    f.write(str(wvf_str6)+ "\n end of bit 6 \n")
+    f.write(str(wvf_str7)+ "\n end of bit 7 \n")
     f.close()
 
     print("Writing check file: " + check_filename)
@@ -100,13 +124,6 @@ if (len(sys.argv) == 4):
     f.write(check_str + "\n\n")
     f.write(check2_str + "\n\n")
     f.write(check3_str + "\n\n")
-    f.write(check4_str + "\n\n")
-    f.write(check5_str + "\n\n")
-    f.write(check6_str + "\n\n")
-    f.write(check7_str + "\n\n")
-    f.write(check8_str + "\n\n")
-    f.write(check9_str + "\n\n")
-    f.write(check10_str + "\n\n")
     f.close()
 
     print("Done")
