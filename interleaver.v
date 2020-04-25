@@ -1,6 +1,6 @@
 //module interleaver (data_in, clk, reset, CRC_start, CRC_blocksize, CRC_end, data_out, data_ready2,
 //                    done, offset,state,next_state,data_in_port,r2_out,r1_out,p1mode_w,r1_wetest,count1_test,pi1_value_test,pi2_value_test,count2_test,counter1_reset);//, next_state, state, counter1_done, counter1_reset, count1,pi1_small_value, pi1_value_test,target1,target2,counter2_done,counter2_reset);
-module interleaver (clk,reset,CRC_start, CRC_blocksize, CRC_end, data_ready2, done,data_in,data_out);
+module interleaver (clk,reset,CRC_start, CRC_blocksize, CRC_end, data_ready1, done,data_in,data_out);
 	
 	input[7:0] data_in;
 	input clk, reset;
@@ -8,7 +8,7 @@ module interleaver (clk,reset,CRC_start, CRC_blocksize, CRC_end, data_ready2, do
 	//input [2:0] offset;
 	
 	output[7:0] data_out;//,data_in_port,r2_out,r1_out,p1mode_w,r1_wetest;
-	output data_ready2, done;//,counter1_reset; // control signals
+	output data_ready1, done;//,counter1_reset; // control signals
 	
 	// debug signals
 	wire [3:0] state, next_state;
@@ -22,7 +22,7 @@ module interleaver (clk,reset,CRC_start, CRC_blocksize, CRC_end, data_ready2, do
 	interleaver_fsm_new FSM (clk, reset, CRC_blocksize, next_state, state, CRC_start, CRC_end, fsm_ready,
 	                     done, p1mode, p2mode, counter1_reset, counter2_reset, counter1_enable,
 								counter2_enable, ram1_we, ram2_we, counter1_done, counter2_done, p1blocksize, p2blocksize);
-	wire data_ready1;
+	wire data_ready2;
 	
 	dff ready_delay (fsm_ready, clk, ~reset, 1'b1, data_ready1);
 	dff ready_delay1 (data_ready1, clk, ~reset, 1'b1, data_ready2);
